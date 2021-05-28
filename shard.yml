@@ -1,0 +1,14 @@
+name: dhash-cr
+version: 0.1.0
+
+authors:
+  - Jonathan B. <greenbigfrog@gmail.com>
+
+crystal: 1.0.0
+
+license: MIT
+
+dependencies:
+  crymagick:
+    github: imdrasil/crymagick
+    branch: bugfix/remove-log-dependency
