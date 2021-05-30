@@ -26,6 +26,7 @@ module Dhash
     # Each output pixel is calculated as sigma[i]{pixel[i] * mask[i]} / scale + offset,
     # where scale and offset are part of mask.
     mask = Vips::Image.new_from_array([[1, -1]])
+    puts "we created mask"
     reduced = formatted.vips_conv(mask)
     puts "we applied mask"
 
@@ -62,8 +63,5 @@ end
 puts "Reading image"
 img = Vips::Image.new_from_file("spec/images/face-high.jpg")
 puts "Read img with width #{img.width} and height #{img.height}"
-
-# a = img.resize(10, 0.1)
-# puts "Resized img to width #{a.width} and height #{a.height}"
 
 Dhash.calculate(img)

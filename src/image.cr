@@ -11,41 +11,47 @@ class Vips::Image
   # Use scale and offset to set the scale and offset fields in the header.
   # These are useful for integer convolutions.
   def self.new_from_array(array, scale = 1, offset = 0) : Vips::Image
-    pp array
-    return Vips::Image.new
-    if array[0].is_a?(Array)
-      height = array.size
-      width = array[0].size
+    puts "Creating new from array"
+    x = -1_f64
+    y = 1_f64
+    a = [x, y]
+    return Vips::Image.matrix_from_array(2,2,a)
+    # if array[0].is_a?(Array)
+    #   height = array.size
+    #   width = array[0].size
 
-      raise "Not a 2D array" unless array.all? { |x| x.is_a?(Array) }
-      raise "Array not rectangular" unless array.all? { |x| x.size == width }
+    #   raise "Not a 2D array" unless array.all? { |x| x.is_a?(Array) }
+    #   raise "Array not rectangular" unless array.all? { |x| x.size == width }
 
-      array = array.flatten
-    else
-      height = 1
-      width = array.size
-    end
+    #   array = array.flatten
+    # else
+    #   height = 1
+    #   width = array.size
+    # end
 
-    raise "Bad array dimensions." unless array.size == width * height
-    raise "Not all array elements are Numeric" unless array.all? { |x| x.is_a? Number }
+    # raise "Bad array dimensions." unless array.size == width * height
+    # raise "Not all array elements are Numeric" unless array.all? { |x| x.is_a? Number }
 
-    image = Vips::Image.matrix_from_array(width, height, array)
-    raise "Resulted in empty image" if image.nil?
+    # image = Vips::Image.matrix_from_array(width, height, array)
+    # raise "Resulted in empty image" if image.nil?
 
-    image.mutate do |mutable|
-      # be careful to set them as double
-      mutable.set_type! GObject::GDOUBLE_TYPE, "scale", scale.to_f
-      mutable.set_type! GObject::GDOUBLE_TYPE, "offset", offset.to_f
-    end
+    # image.mutate do |mutable|
+    #   # be careful to set them as double
+    #   mutable.set_type! GObject::GDOUBLE_TYPE, "scale", scale.to_f
+    #   mutable.set_type! GObject::GDOUBLE_TYPE, "offset", offset.to_f
+    # end
   end
 
   def write_to_file(filename : String)
     LibVips.vips_image_write_to_file(self, filename)
   end
 
-  def resize(hscale : Float64, vscale : Float64)
-    LibVips.vips_resize(self, out scaled, hscale, vscale)
-    Vips::Image.new(scaled)
+  def resize(scale : Float64, vscale : Float64? = nil)
+    operation = Vips::Operation.new("resize")
+    operation.set_property("in", GObject::Object.new(to_unsafe.as(LibGObject::Object*)))
+    operation.set_property("scale", scale)
+    operation.set_property("vscale", vscale) if vscale
+    run_and_get_output(operation)
   end
 
   def crop(left, top, width, height)
@@ -103,13 +109,29 @@ class Vips::Image
   end
 
   def vips_cast(format)
-    LibVips.vips_cast(self, out casted, format)
-    Vips::Image.new(casted)
+    op = Vips::Operation.new("cast")
+    op.set_property("in", in)
+    op.set_property("format", format)
+    run_and_get_output(op)
   end
 
   def vips_conv(mask)
-    LibVips.vips_conv(self, out convulted, mask)
-    Vips::Image.new(convulted)
+    op = Vips::Operation.new("conv")
+    op.set_property("in", in)
+    op.set_property("mask", mask.in)
+    run_and_get_output(op)
+  end
+
+  def in
+    GObject::Object.new(to_unsafe.as(LibGObject::Object*))
+  end
+
+  # for operations with output name "out"
+  def run_and_get_output(operation)
+    Vips.cache_operation_build(operation)
+    output = GObject::Value.new(type: LibVips._vips_image_get_type)
+    LibGObject.object_get_property(operation.to_unsafe.as(LibGObject::Object*), "out", output)
+    Vips::Image.new(output.object.to_unsafe.as(LibVips::Image*))
   end
 
   def self.smap(x, &block : Int32 -> (Array(Float64) | Float64))
