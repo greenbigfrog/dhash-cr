@@ -2,22 +2,20 @@
 
 Main inspiration from https://github.com/Nakilon/dhash-vips
 
-Uses https://github.com/jhass/crystal-gobject to create bindings for https://github.com/davidbyttow/govips
-govips is rather incomplete though, so still plenty of "native" bindings to libvips
+Uses https://github.com/jhass/crystal-gobject to create bindings for libvips, as well as adds on some native bindings
 
 # WIP
 
 ## Installation
 
-1. `go get -v github.com/davidbyttow/govips/v2/vips`
-2. Add the dependency to your `shard.yml`:
+1. Add the dependency to your `shard.yml`:
 
    ```yaml
    dependencies:
      dhash-cr:
        github: greenbigfrog/dhash-cr
    ```
-3. Run `shards install`
+2. Run `shards install`
 
 ## Usage
 
