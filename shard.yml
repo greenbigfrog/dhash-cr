@@ -9,6 +9,6 @@ crystal: 1.0.0
 license: MIT
 
 dependencies:
-  crymagick:
-    github: imdrasil/crymagick
-    branch: bugfix/remove-log-dependency
+  gobject:
+    github: jhass/crystal-gobject
+    branch: main
