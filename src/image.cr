@@ -64,19 +64,24 @@ class Vips::Image
     run_and_get_output(op)
   end
 
-  # TODO allow other type arrays
-  def to_a #: Array(UInt8)?
+  def to_a
+    to_enum.to_a
+  end
+
+  def to_enum
     case self.format
     when Vips::BandFormat::UCHAR
       ptr = self.image_write_to_memory
-      puts "Trying to read Char array from #{ptr}"
       glib_ptr = ptr[0]
-      pp glib_ptr
       pixel_array = Array(UInt8).new
+      i = 0
       glib_ptr.each do |x|
-        pixel_array << UInt8.new(x)
+        i+=1
+        break if i > 64
+
+        pixel_array << x
       end
-      pp pixel_array
+
       raise "Issue Reading from memory" if pixel_array.nil?
       banded_array = pixel_array.each_slice(bands)
       raise "Issue unpacking" if banded_array.nil?
