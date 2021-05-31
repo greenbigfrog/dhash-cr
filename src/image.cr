@@ -48,15 +48,20 @@ class Vips::Image
 
   def resize(scale : Float64, vscale : Float64? = nil)
     operation = Vips::Operation.new("resize")
-    operation.set_property("in", GObject::Object.new(to_unsafe.as(LibGObject::Object*)))
+    operation.set_property("in", in)
     operation.set_property("scale", scale)
     operation.set_property("vscale", vscale) if vscale
     run_and_get_output(operation)
   end
 
   def crop(left, top, width, height)
-    LibVips.vips_crop(self, out cropped, left, top, width, height)
-    Vips::Image.new(cropped)
+    op = Vips::Operation.new("crop")
+    op.set_property("input", in)
+    op.set_property("left", left)
+    op.set_property("top", top)
+    op.set_property("width", width)
+    op.set_property("height", height)
+    run_and_get_output(op)
   end
 
   # https://www.rubydoc.info/gems/ruby-vips/Vips/Image#to_enum-instance_method
@@ -91,8 +96,13 @@ class Vips::Image
   def linear(a_i : Af64, b_i : Af64)
     a = a_i.is_a?(Array(Float64)) ? a_i : [a_i]
     b = b_i.is_a?(Array(Float64)) ? b_i : [b_i]
-    LibVips.vips_linear(self, out calculated, a, b, [a.size, b.size].max)
-    Vips::Image.new(calculated)
+
+    # TODO ArrayDouble fails to convert to GValue
+    op = Vips::Operation.new("linear")
+    op.set_property("in", in)
+    op.set_property("a", Vips::ArrayDouble.new(a).to_gvalue)
+    op.set_property("b", Vips::ArrayDouble.new(b).to_gvalue)
+    run_and_get_output(op)
   end
 
   def /(other)
