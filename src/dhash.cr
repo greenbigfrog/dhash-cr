@@ -25,9 +25,9 @@ module Dhash
     # https://www.rubydoc.info/gems/ruby-vips/Vips/Image#conv-instance_method
     # Each output pixel is calculated as sigma[i]{pixel[i] * mask[i]} / scale + offset,
     # where scale and offset are part of mask.
-    #mask = Vips::Image.new_from_array([[1, -1]])
+    # mask = Vips::Image.new_from_array([[1, -1]])
     puts "we created mask"
-    #reduced = formatted.vips_conv(mask)
+    # reduced = formatted.vips_conv(mask)
     puts "we applied mask"
 
     reduced = formatted # TODO
@@ -62,10 +62,10 @@ module Dhash
   end
 end
 
-puts "Reading image"
-img = Vips::Image.new_from_file("spec/images/face-high.jpg")
-puts "Read img with width #{img.width} and height #{img.height}"
+# puts "Reading image"
+# img = Vips::Image.new_from_file("spec/images/face-high.jpg")
+# puts "Read img with width #{img.width} and height #{img.height}"
 
-Dhash.calculate(img)
+#Dhash.calculate(img)
 
 # img.crop(10, 10, 50, 50).write_to_file("test305023.jpg")
