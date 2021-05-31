@@ -1,11 +1,10 @@
 require "big/big_int"
 
-
 class Array(T)
   # Returns special median element or nil
   def special_median : T?
     h = (@size / 2).to_i32
-    return @buffer[h] if @buffer[h] != @buffer[h-1]
+    return @buffer[h] if @buffer[h] != @buffer[h - 1]
     right = dup
     left = right.shift h
     right.shift if right.size > left.size
@@ -27,7 +26,8 @@ module IDHash
   extend self
 
   def distance(a, b)
-    (a^b).popcount
+    # (a ^ b).popcount
+    ((a ^ b) & (a | b) >> 2 * 64).popcount
   end
 
   def fingerprint(img, power = 3)
@@ -47,15 +47,23 @@ module IDHash
     flat = bw.flatten
 
     #   array = image.to_a.map &:flatten
-    array = flat.to_a.map {|x| x.flatten }
+    array = flat.to_a.map { |x| x.flatten }
     #   d1, i1, d2, i2 = [array, array.transpose].flat_map do |a|
-    #     d = a.zip(a.rotate(1)).flat_map{ |r1, r2| r1.zip(r2).map{ |i,j| i - j } }
-    #     m = @@median.call d.map(&:abs).sort
-    #     [
-    #       d.map{ |c| c     <  0 ? 1 : 0 }.join.to_i(2),
-    #       d.map{ |c| c.abs >= m ? 1 : 0 }.join.to_i(2),
-    #     ]
-    #   end
+    d1, i1, d2, i2 = [array, array.transpose].flat_map do |a|
+      #     d = a.zip(a.rotate(1)).flat_map{ |r1, r2| r1.zip(r2).map{ |i,j| i - j } }
+      d = a.zip(a.rotate(1)).flat_map { |r1, r2| r1.zip(r2).map { |i, j| i.to_i16 - j } }
+      #     m = @@median.call d.map(&:abs).sort
+      sorted = d.map(&.abs).sort!
+      m = sorted.special_median
+      #     [
+      [
+        #       d.map{ |c| c     <  0 ? 1 : 0 }.join.to_i(2),
+        BigInt.new(d.map { |c| c < 0 ? 1 : 0 }.join, 2),
+        #       d.map{ |c| c.abs >= m ? 1 : 0 }.join.to_i(2),
+        BigInt.new(d.map { |c| c.abs >= m ? 1 : 0 }.join, 2) #     ]
+      ]
+    end
     #   (((((i1 << size * size) + i2) << size * size) + d1) << size * size) + d2
+    (((((i1 << size * size) + i2) << size * size) + d1) << size * size) + d2 # TODO what does this do?
   end
 end

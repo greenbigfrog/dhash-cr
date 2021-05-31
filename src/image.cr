@@ -76,7 +76,7 @@ class Vips::Image
       pixel_array = Array(UInt8).new
       i = 0
       glib_ptr.each do |x|
-        i+=1
+        i += 1
         break if i > 64
 
         pixel_array << x

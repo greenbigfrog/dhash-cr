@@ -66,6 +66,6 @@ end
 # img = Vips::Image.new_from_file("spec/images/face-high.jpg")
 # puts "Read img with width #{img.width} and height #{img.height}"
 
-#Dhash.calculate(img)
+# Dhash.calculate(img)
 
 # img.crop(10, 10, 50, 50).write_to_file("test305023.jpg")
