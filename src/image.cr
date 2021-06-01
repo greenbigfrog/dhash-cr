@@ -1,5 +1,22 @@
+struct Img
+  @buffer : IO::Memory
+  @image : Vips::Image
+
+  def initialize(io)
+    @buffer = io
+    @image = Vips::Image.new_from_png_io(@buffer)
+  end
+end
+
 class Vips::Image
   alias Af64 = Array(Float64) | Float64
+
+  # NOTE io needs to stay in memory for duration of existence
+  def self.new_from_png_io(io) : self
+    ok = LibVips.vips_pngload_buffer(io.buffer, io.size, out img)
+    raise Vips.error_buffer unless ok == 0
+    Vips::Image.new(img)
+  end
 
   def self.new_from_file(path : String) : Vips::Image
     Vips::Image.new_from_file_rw(path)
@@ -75,7 +92,7 @@ class Vips::Image
       pixel_array = Array(UInt8).new
       i = 0
       ptr.each do |x|
-        i+=1
+        i += 1
         break if i > len
 
         pixel_array << x if x

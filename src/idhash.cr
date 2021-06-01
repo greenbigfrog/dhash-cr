@@ -60,7 +60,7 @@ module IDHash
         #       d.map{ |c| c     <  0 ? 1 : 0 }.join.to_i(2),
         BigInt.new(d.map { |c| c < 0 ? 1 : 0 }.join, 2),
         #       d.map{ |c| c.abs >= m ? 1 : 0 }.join.to_i(2),
-        BigInt.new(d.map { |c| c.abs >= m ? 1 : 0 }.join, 2) #     ]
+        BigInt.new(d.map { |c| c.abs >= m ? 1 : 0 }.join, 2), #     ]
       ]
     end
     #   (((((i1 << size * size) + i2) << size * size) + d1) << size * size) + d2
