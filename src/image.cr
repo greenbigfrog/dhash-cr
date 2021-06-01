@@ -71,15 +71,14 @@ class Vips::Image
   def to_enum
     case self.format
     when Vips::BandFormat::UCHAR
-      ptr = self.image_write_to_memory
-      glib_ptr = ptr[0]
+      ptr, len = self.image_write_to_memory
       pixel_array = Array(UInt8).new
       i = 0
-      glib_ptr.each do |x|
-        i += 1
-        break if i > 64
+      ptr.each do |x|
+        i+=1
+        break if i > len
 
-        pixel_array << x
+        pixel_array << x if x
       end
 
       raise "Issue Reading from memory" if pixel_array.nil?
@@ -169,7 +168,11 @@ class Vips::Image
     Vips::Image.new(output.object.to_unsafe.as(LibVips::Image*))
   end
 
-  def self.smap(x, &block : Int32 -> (Array(Float64) | Float64))
-    x.is_a?(Array) ? x.map { |y| smap(y, &block) } : block.call(x)
+  def self.smap(x, &)
+    if x.is_a?(Array)
+      x.map { |y| smap(y) { |z| yield z } }
+    else
+      yield x
+    end
   end
 end
