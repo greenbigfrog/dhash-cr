@@ -18,6 +18,16 @@ class Vips::Image
     Vips::Image.new(img)
   end
 
+  def self.new(io : IO) : self
+    img = LibVips.vips_image_new_from_buffer(io.buffer, io.size, "", nil)
+    new(img)
+  end
+
+  def self.new(str : String) : self
+    i = IO::Memory.new(str)
+    new(i)
+  end
+
   def self.new_from_file(path : String) : Vips::Image
     Vips::Image.new_from_file_rw(path)
   end

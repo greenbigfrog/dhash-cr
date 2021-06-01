@@ -35,4 +35,6 @@ lib LibVips
   # https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-pngload-buffer
   # returns 0 on success, -1 on error (or more specific, raises it)
   fun vips_pngload_buffer(buf : Void*, len : LibC::SizeT, output : LibVips::Image**, ...) : LibC::Int
+
+  fun vips_image_new_from_buffer(buffer : UInt8*, len : LibC::SizeT, option_string : LibC::Char*, ...) : LibVips::Image*
 end
