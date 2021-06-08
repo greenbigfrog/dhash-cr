@@ -190,9 +190,7 @@ class Vips::Image
   # for operations with output name "out"
   private def run_and_get_output(operation)
     Vips.cache_operation_build(operation)
-    output = GObject::Value.new(type: LibVips._vips_image_get_type)
-    LibGObject.object_get_property(operation.to_unsafe.as(LibGObject::Object*), "out", output)
-    Vips::Image.new(output.object.to_unsafe.as(LibVips::Image*))
+    operation.get_property("out", Vips::Image)
   end
 
   def self.smap(x, &)

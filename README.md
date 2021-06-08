@@ -12,7 +12,7 @@ Uses https://github.com/jhass/crystal-gobject to create bindings for libvips, as
 
    ```yaml
    dependencies:
-     dhash-cr:
+     dhash:
        github: greenbigfrog/dhash-cr
    ```
 2. Run `shards install`
