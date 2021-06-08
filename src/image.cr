@@ -18,8 +18,8 @@ class Vips::Image
     Vips::Image.new(img)
   end
 
-  def self.new(io : IO) : self
-    img = LibVips.vips_image_new_from_buffer(io.buffer, io.size, "", nil)
+  def self.new(io : IO, access : String = "sequential") : self
+    img = LibVips.vips_image_new_from_buffer(io.buffer, io.size, "[access=#{access}]", nil)
     new(img)
   end
 
